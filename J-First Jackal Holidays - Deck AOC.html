@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J-FIRST — AOC Program Jackal Holidays</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-base:#dfe8cf;
+  --deep:#0f2f1e;
+  --deep-2:#153a26;
+  --deep-3:#0a2015;
+  --bright:#3fe61a;
+  --bright-2:#8dff5c;
+  --mint:#d9e9c6;
+  --mint-line:#bcd6a3;
+  --ink:#0f2f1e;
+  --paper:#f4f8ec;
+  --amber:#e0902e;
+  --line:#2f6b45;
+  --shadow: 0 18px 40px -18px rgba(15,47,30,0.35);
+  --f-display:'Poppins', 'Arial Black', sans-serif;
+  --f-script:'Caveat', cursive;
+  --f-body:'Inter', system-ui, -apple-system, sans-serif;
+}
+
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:var(--f-body);
+  color:var(--ink);
+  background:
+    radial-gradient(ellipse 900px 500px at 85% -5%, rgba(63,230,26,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at -5% 40%, rgba(63,230,26,0.06), transparent 55%),
+    var(--bg-base);
+  overflow-x:hidden;
+}
+
+.wordmark{
+  font-family:var(--f-display);
+  font-weight:900;
+  letter-spacing:-0.02em;
+  background:linear-gradient(100deg, var(--bright-2) 0%, var(--bright) 30%, var(--deep-2) 75%, var(--deep-3) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  display:inline-block;
+}
+
+.script{
+  font-family:var(--f-script);
+  font-weight:700;
+  color:var(--deep-2);
+}
+
+h1,h2,h3{font-family:var(--f-display); margin:0;}
+p{line-height:1.65; margin:0;}
+
+.container{max-width:1080px; margin:0 auto; padding:0 28px;}
+
+/* ---------- Sticky nav ---------- */
+nav.tabs{
+  position:sticky; top:0; z-index:500;
+  background:rgba(223,232,207,0.9);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--mint-line);
+}
+nav.tabs .container{
+  display:flex; align-items:center; gap:22px;
+  padding:14px 28px; overflow-x:auto; scrollbar-width:none;
+}
+nav.tabs .container::-webkit-scrollbar{display:none;}
+nav.tabs .brand{
+  font-family:var(--f-display); font-weight:800; font-size:1.05rem;
+  color:var(--deep); white-space:nowrap; margin-right:8px;
+}
+nav.tabs a{
+  font-size:0.86rem; font-weight:600; color:#3f5a48;
+  text-decoration:none; white-space:nowrap; padding:6px 3px;
+  border-bottom:2px solid transparent; transition:color .2s, border-color .2s;
+}
+nav.tabs a.active, nav.tabs a:hover{color:var(--deep); border-color:var(--bright);}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;
+  min-height:88vh;
+  display:flex; align-items:center;
+  padding:60px 0 80px;
+}
+.hero .eyebrow{
+  display:inline-flex; align-items:center; gap:9px;
+  font-size:0.78rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase;
+  color:var(--deep-2); background:var(--mint); border:1px solid var(--mint-line);
+  padding:7px 16px; border-radius:99px; margin-bottom:26px;
+}
+.hero .eyebrow .dot{width:7px; height:7px; border-radius:50%; background:var(--bright); box-shadow:0 0 0 3px rgba(63,230,26,0.25); flex-shrink:0;}
+.hero .script-line{font-size:clamp(1.6rem, 3.2vw, 2.5rem); margin-bottom:6px;}
+.hero h1.wordmark{font-size:clamp(3.4rem, 11vw, 8rem); line-height:0.92; margin-bottom:22px;}
+.hero .sub{font-size:clamp(1.05rem, 1.6vw, 1.28rem); max-width:640px; color:#274733; margin-bottom:36px;}
+.hero .meta-row{
+  display:flex; flex-wrap:wrap; gap:14px 34px; padding-top:26px; border-top:1px solid var(--mint-line); max-width:720px;
+}
+.hero .meta-row div{font-size:0.82rem;}
+.hero .meta-row .label{display:block; text-transform:uppercase; letter-spacing:0.07em; color:#5b7565; font-weight:700; font-size:0.68rem; margin-bottom:3px;}
+.hero .meta-row .val{color:var(--deep); font-weight:600;}
+
+/* ---------- Section base ---------- */
+section{padding:88px 0;}
+.section-head{max-width:680px; margin-bottom:48px;}
+.section-head .kicker{
+  font-size:0.78rem; font-weight:700; letter-spacing:0.09em; text-transform:uppercase;
+  color:var(--bright); display:block; margin-bottom:14px;
+}
+.section-head .kicker::before{content:"— "; color:var(--deep-2);}
+.section-head h2{font-size:clamp(1.8rem, 3.4vw, 2.5rem); color:var(--deep); line-height:1.15; margin-bottom:16px;}
+.section-head p{color:#3b5744; font-size:1.05rem; max-width:600px;}
+
+/* Reveal: visible by default. JS only ADDS a fade-in enhancement; never hides content on its own. */
+.reveal{opacity:1; transform:none;}
+.reveal.will-animate{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.will-animate.in{opacity:1; transform:translateY(0);}
+
+/* ---------- Basis / rationale ---------- */
+.stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:36px;}
+.stat-card{background:var(--paper); border:1px solid var(--mint-line); border-radius:16px; padding:22px 20px;}
+.stat-card .n{font-family:var(--f-display); font-weight:800; font-size:1.7rem; color:var(--deep);}
+.stat-card .n.down{color:var(--amber);}
+.stat-card .l{font-size:0.8rem; color:#5b7565; margin-top:4px; font-weight:500;}
+
+.chart-panel{background:var(--deep); border-radius:24px; padding:30px 26px 24px; box-shadow:var(--shadow);}
+.chart-panel .chart-head{display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px; margin-bottom:6px;}
+.chart-panel .chart-head h3{color:var(--paper); font-size:1.05rem; font-weight:700;}
+.chart-panel .chart-head span{color:#9fc9a9; font-size:0.8rem;}
+.chart-legend{display:flex; gap:22px; flex-wrap:wrap; margin:14px 2px 4px; font-size:0.78rem; color:#c3dcc1;}
+.chart-legend span{display:inline-flex; align-items:center; gap:7px;}
+.chart-legend i{width:11px; height:11px; border-radius:3px; display:inline-block;}
+.chart-svg{width:100%; height:auto; display:block; margin-top:6px;}
+
+.insight-callout{
+  margin-top:32px; display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:center;
+  background:var(--mint); border:1px solid var(--mint-line); border-radius:18px; padding:24px 28px;
+}
+.insight-callout .badge{
+  font-family:var(--f-display); font-weight:900; font-size:2.1rem; color:var(--amber);
+  background:var(--paper); border-radius:14px; padding:14px 18px; text-align:center; min-width:110px;
+}
+.insight-callout p{color:var(--deep-2); font-size:0.98rem;}
+.insight-callout p b{color:var(--deep);}
+
+details.raw-table{margin-top:22px;}
+details.raw-table summary{cursor:pointer; font-size:0.85rem; font-weight:600; color:#3f5a48; padding:8px 0;}
+table.data{width:100%; border-collapse:collapse; font-size:0.86rem; margin-top:10px;}
+table.data th, table.data td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--mint-line);}
+table.data th{color:#5b7565; font-weight:600; text-transform:uppercase; font-size:0.68rem; letter-spacing:0.05em;}
+table.data td.num{text-align:right; font-variant-numeric:tabular-nums;}
+table.data td.pos{color:var(--deep-2); font-weight:600;}
+table.data td.neg{color:var(--amber); font-weight:600;}
+
+/* ---------- J-Verse diagram ---------- */
+.jverse-wrap{
+  background:linear-gradient(160deg, var(--deep) 0%, var(--deep-3) 100%);
+  border-radius:28px; padding:56px 24px; position:relative; overflow:hidden; box-shadow:var(--shadow);
+}
+.jverse-wrap .ghost{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-family:var(--f-display); font-weight:900; font-size:min(22vw,260px); color:rgba(255,255,255,0.035);
+  letter-spacing:-0.03em; pointer-events:none; user-select:none;
+}
+.orbit{position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;}
+.hub{
+  font-family:var(--f-display); font-weight:800; font-size:1.05rem; color:var(--deep-3);
+  background:linear-gradient(120deg, var(--bright-2), var(--bright));
+  padding:16px 30px; border-radius:16px; text-align:center; letter-spacing:0.02em;
+  box-shadow:0 0 0 6px rgba(63,230,26,0.12);
+}
+.hub span{display:block; font-size:0.66rem; font-weight:600; color:#164623; margin-top:2px; letter-spacing:0.04em;}
+.nodes{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:36px; width:100%; max-width:820px;}
+.node{border-radius:14px; padding:14px 16px; border:1.5px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.03);}
+.node .t{font-family:var(--f-display); font-weight:700; font-size:0.86rem; color:#c9dcc6; display:flex; align-items:center; gap:7px;}
+.node .d{font-size:0.72rem; color:#7a927f; margin-top:3px;}
+.node.active{background:linear-gradient(120deg, rgba(63,230,26,0.18), rgba(141,255,92,0.06)); border-color:var(--bright);}
+.node.active .t{color:var(--bright-2);}
+.node.active .d{color:#a7d9a0;}
+.lock{width:11px; height:11px; flex-shrink:0;}
+
+.jverse-caption{max-width:560px; margin:34px auto 0; text-align:center; color:#9fc9a9; font-size:0.92rem; position:relative; z-index:2;}
+.jverse-caption b{color:var(--paper);}
+
+/* ---------- Mechanics ---------- */
+.mech-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:18px;}
+.mech-primary{
+  background:var(--deep); border-radius:22px; padding:34px 30px; color:var(--paper);
+  display:flex; flex-direction:column; justify-content:space-between; box-shadow:var(--shadow);
+}
+.mech-primary .big{font-family:var(--f-display); font-weight:900; font-size:4rem; line-height:1;}
+.mech-primary .big small{font-size:1.6rem; font-weight:700;}
+.mech-primary .cap{color:#9fc9a9; font-size:0.9rem; margin-top:6px;}
+.split-bar{display:flex; height:34px; border-radius:99px; overflow:hidden; margin-top:22px; font-size:0.76rem; font-weight:700;}
+.split-bar div{display:flex; align-items:center; justify-content:center;}
+.split-bar .tbk{background:var(--bright); color:var(--deep-3); flex:1;}
+.split-bar .jkl{background:rgba(255,255,255,0.12); color:var(--paper); flex:1;}
+
+.mech-side{display:flex; flex-direction:column; gap:18px;}
+.mini-card{background:var(--paper); border:1px solid var(--mint-line); border-radius:18px; padding:20px 22px;}
+.mini-card .k{font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; color:#5b7565; font-weight:700;}
+.mini-card .v{font-family:var(--f-display); font-weight:800; font-size:1.5rem; color:var(--deep); margin-top:4px;}
+.mini-card .v small{font-size:0.9rem; font-weight:600; color:#5b7565;}
+
+.timeline{margin-top:36px;}
+.phase-row{display:grid; grid-template-columns:110px 1fr; gap:18px; align-items:center; margin-bottom:14px;}
+.phase-tag{
+  font-family:var(--f-display); font-weight:700; font-size:0.82rem; color:var(--deep);
+  background:var(--mint); border:1px solid var(--mint-line); border-radius:10px; padding:8px 10px; text-align:center;
+}
+.phase-track{position:relative; height:46px; background:var(--paper); border:1px solid var(--mint-line); border-radius:12px; overflow:hidden;}
+.phase-fill{position:absolute; inset:0; display:flex; align-items:center; padding:0 16px; font-size:0.8rem; font-weight:600; color:var(--deep-3);}
+.phase-fill.q3{background:linear-gradient(100deg, var(--bright-2), var(--bright));}
+.phase-fill.q4{background:repeating-linear-gradient(120deg, rgba(63,230,26,0.16), rgba(63,230,26,0.16) 10px, rgba(63,230,26,0.06) 10px, rgba(63,230,26,0.06) 20px); color:#3f5a48;}
+
+/* ---------- T&C ---------- */
+.tnc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:16px;}
+.tnc-card{border-radius:16px; padding:22px 24px;}
+.tnc-card.dark{background:var(--deep); color:var(--paper);}
+.tnc-card.light{background:var(--mint); border:1px solid var(--mint-line); color:var(--deep-2);}
+.tnc-card h4{font-family:var(--f-display); font-size:0.82rem; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:14px; opacity:0.75;}
+.tnc-card ul{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:10px; font-size:0.92rem;}
+.tnc-card.dark ul{color:#d7e6d4;}
+.tnc-card em{opacity:0.75;}
+
+.note-flag{
+  margin-top:18px; display:flex; gap:12px; align-items:flex-start;
+  background:var(--paper); border:1px dashed var(--line); border-radius:14px; padding:16px 18px; font-size:0.86rem; color:#3b5744;
+}
+
+/* ---------- Closing ---------- */
+.closing{
+  background:linear-gradient(160deg, var(--deep) 0%, var(--deep-3) 100%);
+  border-radius:28px; padding:70px 40px; text-align:center; color:var(--paper); position:relative; overflow:hidden; box-shadow:var(--shadow);
+}
+.closing .script{font-size:clamp(1.6rem,3vw,2.2rem); color:var(--bright-2); display:block; margin-bottom:14px;}
+.closing h2.wordmark{font-size:clamp(2.6rem,7vw,4.2rem); margin-bottom:22px;}
+.closing p{max-width:560px; margin:0 auto 34px; color:#c3dcc1; font-size:1.02rem;}
+.closing .sign{display:inline-flex; flex-direction:column; gap:6px; border-top:1px solid rgba(255,255,255,0.18); padding-top:16px; font-size:0.85rem; color:#9fc9a9;}
+.closing .sign b{color:var(--paper); font-family:var(--f-display);}
+
+footer{padding:30px 0 60px; text-align:center; color:#5b7565; font-size:0.78rem;}
+
+@media (max-width:760px){
+  .stat-row{grid-template-columns:repeat(2,1fr);}
+  .nodes{grid-template-columns:repeat(2,1fr);}
+  .mech-grid{grid-template-columns:1fr;}
+  .tnc-grid{grid-template-columns:1fr;}
+  .insight-callout{grid-template-columns:1fr;}
+  .phase-row{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto;}
+  .reveal.will-animate{transition:none; opacity:1; transform:none;}
+}
+</style>
+</head>
+<body>
+
+<nav class="tabs">
+  <div class="container">
+    <span class="brand">J·VERSE</span>
+    <a href="#ringkasan">Ringkasan</a>
+    <a href="#basis">Basis Data</a>
+    <a href="#jverse">Posisi J-First</a>
+    <a href="#mekanisme">Mekanisme</a>
+    <a href="#syarat">Syarat &amp; Ketentuan</a>
+    <a href="#penutup">Penutup</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="ringkasan">
+  <div class="container">
+    <div class="eyebrow"><span class="dot"></span>AOC Program · Persembahan untuk Jackal Holidays</div>
+    <div class="script-line script">Because there's always a</div>
+    <h1 class="wordmark">J-FIRST</h1>
+    <p class="sub">Program akuisisi <b>New User Online</b> — gerbang pertama dari ekosistem J-Verse. Dirancang untuk menyalakan kembali pertumbuhan pengguna baru di platform resmi Jackal Holidays.</p>
+    <div class="meta-row">
+      <div><span class="label">Disiapkan untuk</span><span class="val">Jackal Holidays — VVIP Partner</span></div>
+      <div><span class="label">Disiapkan oleh</span><span class="val">Strategic Marketing, Flores Digital Labs</span></div>
+      <div><span class="label">Periode diajukan</span><span class="val">Juli 2026</span></div>
+      <div><span class="label">Cakupan</span><span class="val">Q3–Q4 2026</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- BASIS DATA -->
+<section id="basis">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Basis Aktivasi</span>
+      <h2>Basis besar, tapi growth online belum bicara</h2>
+      <p>Jackal Holidays adalah salah satu operator dengan basis penumpang terbesar di ekosistem whitelabel — namun performa <b>New User Online</b> dalam 6 bulan terakhir justru menunjukkan tren yang stagnan, bahkan cenderung menurun.</p>
+    </div>
+
+    <div class="stat-row reveal">
+      <div class="stat-card"><div class="n">7.120</div><div class="l">New user tertinggi — Jan 2026</div></div>
+      <div class="stat-card"><div class="n">5.815</div><div class="l">New user terendah — Feb 2026</div></div>
+      <div class="stat-card"><div class="n down">-0,40%</div><div class="l">Rata-rata growth MoM (Jan–Jun)</div></div>
+      <div class="stat-card"><div class="n down">-6,95%</div><div class="l">Perubahan kumulatif Jan → Jun</div></div>
+    </div>
+
+    <div class="chart-panel reveal">
+      <div class="chart-head">
+        <h3>New User WL — Jackal Holidays (Jan–Jun 2026)</h3>
+        <span>Volume new user (batang) vs. growth MoM % (garis)</span>
+      </div>
+      <div class="chart-legend">
+        <span><i style="background:var(--bright);"></i>New User WL</span>
+        <span><i style="background:var(--amber);"></i>Growth MoM (%)</span>
+      </div>
+
+      <svg class="chart-svg" viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grafik new user WL dan growth MoM Jackal Holidays Januari sampai Juni 2026">
+        <!-- zero-growth reference line -->
+        <line x1="20" y1="115" x2="620" y2="115" stroke="#ffffff" stroke-opacity="0.15" stroke-dasharray="4 5"/>
+        <text x="624" y="119" fill="#7a927f" font-size="9" font-family="Inter, sans-serif">0%</text>
+
+        <!-- bars: New User WL -->
+        <g fill="#3fe61a" fill-opacity="0.55">
+          <rect x="50" y="40.9" width="40" height="169.1" rx="4"/>
+          <rect x="150" y="71.9" width="40" height="138.1" rx="4"/>
+          <rect x="250" y="39.3" width="40" height="170.7" rx="4"/>
+          <rect x="350" y="49.8" width="40" height="160.2" rx="4"/>
+          <rect x="450" y="37.8" width="40" height="172.2" rx="4"/>
+          <rect x="550" y="52.7" width="40" height="157.3" rx="4"/>
+        </g>
+
+        <!-- bar value labels -->
+        <g fill="#eef5e6" font-size="11.5" font-family="Inter, sans-serif" font-weight="600" text-anchor="middle">
+          <text x="70" y="33">7.120</text>
+          <text x="170" y="64">5.815</text>
+          <text x="270" y="32">7.189</text>
+          <text x="370" y="42">6.747</text>
+          <text x="470" y="30">7.250</text>
+          <text x="570" y="45">6.625</text>
+        </g>
+
+        <!-- growth line (Feb-Jun only, Jan has no MoM) -->
+        <polyline points="170,184.7 270,25.2 370,138.4 470,86.7 570,147.8" fill="none" stroke="#e0902e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <g>
+          <circle cx="170" cy="184.7" r="5" fill="#e0902e"/>
+          <circle cx="270" cy="25.2" r="5" fill="#8dff5c"/>
+          <circle cx="370" cy="138.4" r="5" fill="#e0902e"/>
+          <circle cx="470" cy="86.7" r="5" fill="#8dff5c"/>
+          <circle cx="570" cy="147.8" r="5" fill="#e0902e"/>
+        </g>
+        <g font-size="11" font-family="Inter, sans-serif" font-weight="700" text-anchor="middle">
+          <text x="170" y="202" fill="#e0902e">-18,33%</text>
+          <text x="270" y="16" fill="#8dff5c">+23,63%</text>
+          <text x="370" y="156" fill="#e0902e">-6,15%</text>
+          <text x="470" y="105" fill="#8dff5c">+7,46%</text>
+          <text x="570" y="165" fill="#e0902e">-8,62%</text>
+        </g>
+
+        <!-- month labels -->
+        <g fill="#9fc9a9" font-size="12" font-family="Inter, sans-serif" text-anchor="middle">
+          <text x="70" y="232">Jan</text>
+          <text x="170" y="232">Feb</text>
+          <text x="270" y="232">Mar</text>
+          <text x="370" y="232">Apr</text>
+          <text x="470" y="232">May</text>
+          <text x="570" y="232">Jun</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="insight-callout reveal">
+      <div class="badge">-0,40%</div>
+      <p><b>Rata-rata pertumbuhan bulanan minus</b> di tengah basis penumpang yang sudah sangat besar. Artinya: akuisisi pengguna baru di platform resmi <b>tidak sedang bertumbuh secara organik</b> — dan butuh stimulus terarah untuk membalik tren ini sebelum masuk ke fase berikutnya di J-Verse.</p>
+    </div>
+
+    <details class="raw-table reveal">
+      <summary>Lihat data bulanan lengkap</summary>
+      <table class="data">
+        <thead><tr><th>Bulan</th><th style="text-align:right">New User WL</th><th style="text-align:right">Growth MoM</th></tr></thead>
+        <tbody>
+          <tr><td>Jan-2026</td><td class="num">7.120</td><td class="num">—</td></tr>
+          <tr><td>Feb-2026</td><td class="num">5.815</td><td class="num neg">-18,33%</td></tr>
+          <tr><td>Mar-2026</td><td class="num">7.189</td><td class="num pos">+23,63%</td></tr>
+          <tr><td>Apr-2026</td><td class="num">6.747</td><td class="num neg">-6,15%</td></tr>
+          <tr><td>May-2026</td><td class="num">7.250</td><td class="num pos">+7,46%</td></tr>
+          <tr><td>Jun-2026</td><td class="num">6.625</td><td class="num neg">-8,62%</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </div>
+</section>
+
+<!-- J-VERSE POSITION -->
+<section id="jverse">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Posisi dalam Ekosistem</span>
+      <h2>J-First adalah gerbang pertama J-Verse</h2>
+      <p>Sebelum masuk ke program loyalti, referral, atau gamifikasi yang lebih kompleks, fondasinya harus dimulai dari satu titik: menambah pengguna baru yang bertransaksi di platform resmi.</p>
+    </div>
+
+    <div class="jverse-wrap reveal">
+      <div class="ghost">J-VERSE</div>
+      <div class="orbit">
+        <div class="hub">J-VERSE<span>Ekosistem Program Jackal Holidays</span></div>
+        <div class="nodes">
+          <div class="node active">
+            <div class="t"><svg class="lock" viewBox="0 0 24 24" fill="none"><path d="M6 11V8a6 6 0 0 1 10.7-3.7M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>J-FIRST</div>
+            <div class="d">New Online User — aktif diajukan sekarang</div>
+          </div>
+          <div class="node">
+            <div class="t">J-PASS</div>
+            <div class="d">Bundling Program</div>
+          </div>
+          <div class="node">
+            <div class="t"><svg class="lock" viewBox="0 0 24 24" fill="none"><path d="M6 11V8a6 6 0 0 1 12 0v3M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>J-CONNECT</div>
+            <div class="d">Referral Program</div>
+          </div>
+          <div class="node">
+            <div class="t"><svg class="lock" viewBox="0 0 24 24" fill="none"><path d="M6 11V8a6 6 0 0 1 12 0v3M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>TOP-J</div>
+            <div class="d">Membership Program</div>
+          </div>
+          <div class="node">
+            <div class="t"><svg class="lock" viewBox="0 0 24 24" fill="none"><path d="M6 11V8a6 6 0 0 1 12 0v3M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>J-COIN</div>
+            <div class="d">Point Program</div>
+          </div>
+          <div class="node">
+            <div class="t"><svg class="lock" viewBox="0 0 24 24" fill="none"><path d="M6 11V8a6 6 0 0 1 12 0v3M6 11h12v9H6v-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>J-BOX</div>
+            <div class="d">Gamifikasi Promo</div>
+          </div>
+          <div class="node">
+            <div class="t">J-DEALS</div>
+            <div class="d">Flashsale Program</div>
+          </div>
+          <div class="node">
+            <div class="t">HOKI / BIG DEALS</div>
+            <div class="d">PP Only &amp; Promo Bandara</div>
+          </div>
+        </div>
+      </div>
+      <div class="jverse-caption">Program lain menunggu fondasi pengguna baru yang sehat. <b>J-First dijalankan lebih dulu</b> sebagai pilot rutin — hasilnya menentukan momentum untuk membuka tahap J-Verse berikutnya.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MEKANISME -->
+<section id="mekanisme">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Mekanisme Program</span>
+      <h2>Bagaimana J-First bekerja</h2>
+      <p>Insentif flat, kuota terkontrol, dan periode terbatas — dirancang sebagai pilot program yang mudah diukur dampaknya terhadap new user acquisition.</p>
+    </div>
+
+    <div class="mech-grid reveal">
+      <div class="mech-primary">
+        <div>
+          <div class="big">1.000 <small>user</small></div>
+          <div class="cap">Total kuota J-First — dibagi dua tahap aktivasi sepanjang 2026</div>
+        </div>
+        <div>
+          <div class="split-bar"><div class="tbk">50% TBK</div><div class="jkl">50% Jackal Holidays</div></div>
+          <div class="cap" style="margin-top:8px;">Skema pendanaan budget promo, ditanggung bersama</div>
+        </div>
+      </div>
+      <div class="mech-side">
+        <div class="mini-card"><div class="k">Nilai Voucher</div><div class="v">Rp 10.000 <small>/ transaksi, flat</small></div></div>
+        <div class="mini-card"><div class="k">Target Pengguna</div><div class="v" style="font-size:1.05rem;">Belum pernah bertransaksi di platform resmi WL</div></div>
+        <div class="mini-card"><div class="k">Budget Fase Q3</div><div class="v">Rp 5.000.000 <small>/ 500 kuota</small></div></div>
+      </div>
+    </div>
+
+    <div class="timeline reveal">
+      <div class="phase-row">
+        <div class="phase-tag">Q3 2026</div>
+        <div class="phase-track"><div class="phase-fill q3">500 kuota · 20 Juli – 20 Agustus 2026 (30 hari)</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-tag">Q4 2026</div>
+        <div class="phase-track"><div class="phase-fill q4">500 kuota · jadwal menyusul, mengikuti hasil evaluasi Q3</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SYARAT & KETENTUAN -->
+<section id="syarat">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="kicker">Syarat &amp; Ketentuan</span>
+      <h2>Aturan main yang menjaga program tetap sehat</h2>
+      <p>Struktur voucher dibuat sederhana bagi user, namun tetap disiplin secara finansial bagi operator.</p>
+    </div>
+
+    <div class="tnc-grid reveal">
+      <div class="tnc-card light">
+        <h4>Cakupan &amp; Kombinasi</h4>
+        <ul>
+          <li>Berlaku untuk semua rute, <em>kecuali rute bandara</em></li>
+          <li>Tidak bisa digabung dengan diskon lain — namun <em>bisa</em> digabung dengan promo lain</li>
+          <li>Berlaku one-way maupun PP (pergi-pulang)</li>
+          <li>Masa berlaku hanya sepanjang periode program berjalan</li>
+        </ul>
+      </div>
+      <div class="tnc-card dark">
+        <h4>Ketentuan Voucher</h4>
+        <ul>
+          <li>Voucher memotong langsung total nilai transaksi</li>
+          <li>Potongan bersifat flat, tidak berlaku kelipatan</li>
+          <li>Tidak bisa dipindahtangankan atau diperjualbelikan</li>
+          <li>Tidak berlaku untuk re-schedule, re-fund, maupun re-route</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note-flag reveal">
+      <span>⚑</span>
+      <span>Voucher dihitung berdasarkan <b>pemakaian aktual</b>, bukan dari jumlah yang ter-generate — dan periode program dapat berubah menyesuaikan keputusan Jackal Holidays.</span>
+    </div>
+  </div>
+</section>
+
+<!-- PENUTUP -->
+<section id="penutup">
+  <div class="container">
+    <div class="closing reveal">
+      <span class="script">Because there's always a</span>
+      <h2 class="wordmark">J-FIRST</h2>
+      <p>Kami mengajukan aktivasi J-First untuk membalik tren new user online Jackal Holidays, dimulai dari fase Q3 2026 — 500 kuota, 20 Juli hingga 20 Agustus 2026.</p>
+      <div class="sign"><span>Menanti persetujuan Jackal Holidays</span><b>Strategic Marketing — Flores Digital Labs (FDL)</b></div>
+    </div>
+  </div>
+</section>
+
+<footer>Dokumen internal &amp; VVIP partner — Flores Digital Labs × Jackal Holidays · Juli 2026</footer>
+
+<script>
+// Purely additive enhancements. Everything above already renders and reads
+// fine with zero JavaScript. If anything here fails, it fails silently
+// and content stays fully visible.
+(function(){
+  try{
+    if(!('IntersectionObserver' in window)) return;
+    var items = document.querySelectorAll('.reveal');
+    items.forEach(function(el){ el.classList.add('will-animate'); });
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, {threshold:0.12});
+    items.forEach(function(el){ io.observe(el); });
+  }catch(err){ /* silently ignore, content already visible */ }
+})();
+
+(function(){
+  try{
+    var sections = document.querySelectorAll('section[id]');
+    var navLinks = document.querySelectorAll('nav.tabs a');
+    if(!sections.length || !navLinks.length || !('IntersectionObserver' in window)) return;
+    var navIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          navLinks.forEach(function(l){ l.classList.remove('active'); });
+          var link = document.querySelector('nav.tabs a[href="#'+entry.target.id+'"]');
+          if(link) link.classList.add('active');
+        }
+      });
+    }, {rootMargin:'-40% 0px -50% 0px'});
+    sections.forEach(function(s){ navIO.observe(s); });
+  }catch(err){ /* silently ignore */ }
+})();
+</script>
+
+</body>
+</html>
